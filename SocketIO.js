@@ -2,8 +2,9 @@ const http = require('http');
 const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
-var bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 const io = require('socket.io').listen(server);
+const mysql = require('mysql');
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -11,12 +12,27 @@ app.use(bodyParser.json());
 users = [];
 connections = [];
 
+let connection = mysql.createConnection({
+	host : "localhost",
+	user : "user",
+	password : "",
+	database : "chat"
+});
+
 server.listen(8080);
 console.log('Server is running...');
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
+
+app.get('/users', (req, res) => {
+  let query = `SELECT * FROM users`;
+	connection.query(query, function (err, result) {
+		if (err) throw err
+		console.log('user_data', result)
+	})
+})
 
 io.sockets.on('connection', socket => {
 
