@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <title>Ngetes socket client</title>
+    <style>
+      div.container4 {
+        display: block;
+        height: 50px;
+        position: relative;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #e9ecef;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+      }
+      div.container4 button {
+        margin: 0;
+        margin-left: 0.75rem;
+        position: absolute;
+        color: #6c757d;
+        top: 50%;
+        transform: translate(0, -50%);
+      }
+      #get-username-id:hover {
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" style="margin-top: 70px">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="col-md-12" style="margin-bottom: 30px">
+            <div id="current-id-socket">
+            </div>
+            <form id="submit-username">
+              <div class="form-group">
+                <label for="exampleInputEmail1"
+                  ><strong>Username:</strong></label
+                >
+                <input
+                  id="username-data"
+                  class="form-control"
+                  placeholder="Enter username..."
+                  autocomplete="off"
+                />
+              </div>
+              <button
+                id="username-data-button"
+                type="submit"
+                class="btn btn-primary"
+              >
+                Submit
+              </button>
+            </form>
+          </div>
+          <div class="col-md-12">
+            <h5>
+              Users Online
+              <span
+                id="user_count"
+                class="badge badge-success"
+                style="font-size: 12px"
+                >0</span
+              >
+            </h5>
+            <ul id="appended-username" class="list-group"></ul>
+          </div>
+        </div>
+        <div class="col-md-8">
+          <div class="row">
+            <div class="col-md-5">
+              <div class="form-group">
+                <label for="exampleInputEmail1"><strong>To</strong></label>
+                <div id="send-to-data" class="container4">
+                  <!-- <button type="button" class="btn btn-outline-success">Success</button> -->
+                </div>
+              </div>
+            </div>
+            <br />
+          </div>
+          <div class="row">
+            <div class="col-lg-12">
+              <form id="submit-chat">
+                <div class="form-group">
+                  <label for="exampleInputEmail1"
+                    ><strong>Input Chat</strong></label
+                  >
+                  <input
+                    id="chat-data"
+                    class="form-control"
+                    placeholder="Enter message"
+                    autocomplete="off"
+                    disabled
+                  />
+                </div>
+                <button
+                  id="chat-data-button"
+                  type="submit"
+                  class="btn btn-primary"
+                  disabled
+                >
+                  Kirim pesan
+                </button>
+              </form>
+              <div id="appended-chat" style="margin-top:20px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+
+    <script>
+      const socket = io('http://127.0.0.1:8080');
+      // receipt control
+      let sendToData = $('#send-to-data');
+      let receiptTarget = $('#receipt-target');
+      // username control
+      let submitUsername = $('#submit-username');
+      let usernameData = $('#username-data');
+      let usernameDataButton = $('#username-data-button');
+      let appendedUsername = $('#appended-username');
+      let userCount = $('#user_count');
+      // chat control
+      let submitchat = $('#submit-chat');
+      let chatData = $('#chat-data');
+      let chatDataButton = $('#chat-data-button');
+      let appendedChat = $('#appended-chat');
+
+      // input receipt
+      sendToData.append(
+        `<button class="btn btn-outline-danger" style="border-color:white; background-color: transparent;">Select a receipt.</button>`,
+      );
+      appendedUsername.on('click', '#get-username-id', function() {
+        sendToData.html('');
+        sendToData.append(
+          `<button id="receipt-target" class="btn btn-outline-success" value="${$(
+            this,
+          ).attr('value')}">${$(this).text()}</button>`,
+        );
+      });
+
+      // delete receipt
+      sendToData.on('click', '#receipt-target', function() {
+        $(this).remove();
+        // alert(`[SOCKET ID]: ${$(this).attr("value")} \n[USERNAME]: ${$(this).text()}`)
+        sendToData.append(
+          `<button class="btn btn-outline-danger" style="border-color:white; background-color: transparent;">Select a receipt.</button>`,
+        );
+      });
+
+      submitUsername.on('submit', e => {
+        e.preventDefault();
+
+        // set_username_socket
+        socket.emit('set_username_socket', {
+          id_socket: socket.id,
+          username_socket: usernameData.val()
+        });
+
+        $('.container4').css('background-color', 'white');
+        $('#current-id-socket').html(`<p>${socket.id}</p>`)
+        chatData.removeAttr('disabled');
+        chatDataButton.removeAttr('disabled');
+        usernameData.attr('disabled', 'disabled');
+        usernameDataButton.attr('disabled', 'disabled');
+      });
+
+      submitchat.submit(e => {
+        e.preventDefault();
+
+        let usernameData = $('#username-data');
+        let getSocketId = sendToData.html();
+        let regReplace1 = getSocketId.replace(
+          /<button id="receipt-target" class="btn btn-outline-success" value="/gi,
+          '',
+        );
+        let regReplace2 = regReplace1.replace(/">.+<\/button>/gi, '');
+
+        // $.ajax({
+        //   type: 'POST',
+        //   url: '/send-message',
+        //   data: {
+        //     id_socket: regReplace2,
+        //     message: chatData.val(),
+        //   },
+        //   success: function(response) {
+        //     sendToData.append(
+        //       `<button type="button" class="btn btn-outline-success">${
+        //         response.username
+        //       }</button>`,
+        //     );
+        //     sendToData.html('');
+        //     sendToData.append(
+        //       `<button class="btn btn-outline-danger" style="border-color:white; background-color: transparent;">Select a receipt.</button>`,
+        //     );
+        //   },
+        // });
+
+        // socket send message
+        socket.emit('send message', {
+          id_socket: regReplace2,
+          sender_id_socket: socket.id,
+          username_socket: usernameData.val(),
+          message: chatData.val(),
+        });
+
+        chatData.val('');
+      });
+
+      socket.on('new message', data => {
+        appendedChat.append(
+          `<div class="card card-body bg-light" style="margin-top:5px">${
+            data.username_socket
+          }: ${data.message}</div>`,
+        );
+      });
+
+      socket.on('private message', data => {
+        console.log('private_message_to_web', data);
+        appendedChat.append(
+          `<div class="card card-body bg-light" style="margin-top:5px">${
+            data.username_socket
+          }: ${data.message}</div>`,
+        );
+      });
+
+      // socket get_online_users
+      socket.on('get_online_users', data => {
+        let username = "No Name"
+        appendedUsername.html('');
+
+        for (let i = 0; i < data.users.length; i++) {
+          if (data.users[i].id_socket !== socket.id && data.users[i].username_socket) {
+            data.users[i].username_socket == usernameData.val()
+            ? null
+            : appendedUsername.append(
+              `<li id="get-username-id" value="${
+                data.users[i].id_socket
+              }" class="list-group-item" style="margin-top: 5px">${
+                data.users[i].username_socket
+              }</li>`,
+            );
+          }
+        }
+
+        userCount.text(data.users.filter(item => item.id_socket !== socket.id).length);
+      });
+    </script>
+  </body>
+</html>
