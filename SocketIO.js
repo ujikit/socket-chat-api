@@ -30,7 +30,8 @@ app.get('/users', (req, res) => {
   let query = `SELECT * FROM users`;
 	connection.query(query, function (err, result) {
 		if (err) throw err
-		console.log('user_data', result)
+		console.log('user_data', result);
+    res.json(result);
 	})
 })
 
