@@ -26,6 +26,30 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
+app.post('/login', (req, res) => {
+  console.log('request_data', req.body);
+  let {username} = req.body;
+  let query = `SELECT * FROM users WHERE username='${username}'`;
+	connection.query(query, function (err, result) {
+    console.log('user_data', result);
+
+		if (err) throw err
+    if (!result.length) {
+      return res.json({
+        code: 401,
+        message: 'Pengguna tidak ditemukan.',
+        data: []
+      })
+    }
+
+    return res.json({
+      code: 200,
+      message: 'Login berhasil.',
+      data: result
+    })
+	})
+})
+
 app.get('/users', (req, res) => {
   let query = `SELECT * FROM users`;
 	connection.query(query, function (err, result) {
