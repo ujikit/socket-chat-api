@@ -50,11 +50,43 @@ app.post('/login', (req, res) => {
 	})
 })
 
+app.put('/set-id-socket-user', (req, res) => {
+  console.log('[request_data] /set-id-socket-user =>', req.body);
+
+  let {username, id_socket} = req.body;
+  let query = `UPDATE users SET id_socket='${id_socket}' WHERE username='${username}'`;
+	connection.query(query, function (err, result) {
+    console.log('set_socket_id_data', result);
+
+		if (err) throw err
+    return res.json({
+      code: 200,
+      message: `Update id socket pengguna ${username} berhasil. ${id_socket}`,
+      data: result
+    })
+	})
+})
+
 app.get('/users', (req, res) => {
+	console.log('[request_data] /users =>', req.body);
+
   let query = `SELECT * FROM users`;
 	connection.query(query, function (err, result) {
 		if (err) throw err
 		console.log('user_data', result);
+    res.json(result);
+	})
+})
+
+app.get('/conversations/:username', (req, res) => {
+	console.log('[request_data] /conversations =>', req.params);
+
+	let {username} = req.params;
+	console.log('nasdnsand', username);
+  let query = `SELECT * FROM conversations WHERE sender_username = '${username}' OR receiver_username = '${username}'`;
+	connection.query(query, function (err, result) {
+		if (err) throw err
+		console.log('conversations_data', result);
     res.json(result);
 	})
 })
