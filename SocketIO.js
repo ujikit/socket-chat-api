@@ -67,10 +67,11 @@ app.put('/set-id-socket-user', (req, res) => {
 	})
 })
 
-app.get('/users', (req, res) => {
-	console.log('[request_data] /users =>', req.body);
+app.get('/show-user/:username', (req, res) => {
+	console.log('[request_data] /show_user/:username =>', req.body);
 
-  let query = `SELECT * FROM users`;
+	let {username} = req.params;
+  let query = `SELECT * FROM users where username = '${username}'`;
 	connection.query(query, function (err, result) {
 		if (err) throw err
 		console.log('user_data', result);
@@ -156,28 +157,15 @@ io.sockets.on('connection', socket => {
     res.status(200).json(req.body);
   });
 
-  // send message [PRIVATE]
-  // app.post('/send-message', (req, res) => {
-  //   let {id_socket, message} = req.body;
-  //   res.status(200).json(req.body);
-  //
-  //   // trigger new message to view
-  //   console.log(`send to ${id_socket}`);
-  //   io.to(`${id_socket}`).emit('private message', {
-  //     id_socket: id_socket,
-  //     msg: message,
-  //   });
-  // });
-
   // send message [PUBLIC]
   socket.on('send message', (data) => {
     // trigger new message to view
-    io.to(`${data.id_socket}`).emit('private message', {
+    io.to(`${data.id_socket_target}`).emit('private message', {
       id: new Date().getTime(),
-      id_socket: data.id_socket,
-      sender_id_socket: data.sender_id_socket,
-      username_socket: data.username_socket,
-      message: data.message,
+      id_socket_target: data.id_socket_target,
+      id_socket_sender: data.id_socket_sender,
+      username_sender: data.username_sender,
+      message: data.message
     })
   })
 });
