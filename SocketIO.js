@@ -82,8 +82,19 @@ app.get('/conversations/:username', (req, res) => {
 	console.log('[request_data] /conversations =>', req.params);
 
 	let {username} = req.params;
-	console.log('nasdnsand', username);
   let query = `SELECT * FROM conversations WHERE sender_username = '${username}' OR receiver_username = '${username}'`;
+	connection.query(query, function (err, result) {
+		if (err) throw err
+		console.log('conversations_data', result);
+    res.json(result);
+	})
+})
+
+app.get('/conversation-messages/:username/:receiver_username', (req, res) => {
+	console.log('[request_data] /conversation-messages/:username/:receiver_username =>', req.params);
+
+	let {username, receiver_username} = req.params;
+  let query = `SELECT * FROM conversations WHERE sender_username = '${username}' OR receiver_username = '${username}' OR sender_username = '${receiver_username}' OR receiver_username = '${receiver_username}'`;
 	connection.query(query, function (err, result) {
 		if (err) throw err
 		console.log('conversations_data', result);
