@@ -44,7 +44,7 @@ app.post('/login', (req, res) => {
 
     return res.json({
       code: 200,
-      message: 'Login berhasil.',
+      message: 'Succesfully logged in.',
       data: result
     })
 	})
