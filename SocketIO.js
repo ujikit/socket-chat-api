@@ -20,7 +20,7 @@ let connection = mysql.createConnection({
 });
 
 server.listen(8080);
-console.log('Server is running...');
+console.log('Server is running in: http://localhost:8080');
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
@@ -159,13 +159,18 @@ io.sockets.on('connection', socket => {
 
   // send message [PUBLIC]
   socket.on('send message', (data) => {
-    // trigger new message to view
-    io.to(`${data.id_socket_target}`).emit('private message', {
-      id: new Date().getTime(),
-      id_socket_target: data.id_socket_target,
-      id_socket_sender: data.id_socket_sender,
-      username_sender: data.username_sender,
-      message: data.message
-    })
+		try {
+			console.log('zxcxcsdsd', data);
+			// trigger new message to view
+			io.to(data.id_socket).emit('private message', {
+				id: new Date().getTime(),
+				id_socket_target: data.id_socket,
+				id_socket_sender: data.sender_id_socket,
+				username_sender: data.username_socket,
+				message: data.message
+			})
+		} catch (e) {
+			console.log('error', JSOn.stringify(e));
+		}
   })
 });

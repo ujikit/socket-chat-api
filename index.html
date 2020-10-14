@@ -238,19 +238,10 @@
         chatData.val('');
       });
 
-      socket.on('new message', data => {
-        appendedChat.append(
-          `<div class="card card-body bg-light" style="margin-top:5px">${
-            data.username_socket
-          }: ${data.message}</div>`,
-        );
-      });
-
       socket.on('private message', data => {
-        console.log('private_message_to_web', data);
         appendedChat.append(
           `<div class="card card-body bg-light" style="margin-top:5px">${
-            data.username_socket
+            data.username_sender
           }: ${data.message}</div>`,
         );
       });
