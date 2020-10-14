@@ -44,7 +44,7 @@ app.post('/login', (req, res) => {
 
     return res.json({
       code: 200,
-      message: 'Login berhasil.',
+      message: 'Succesfully logged in.',
       data: result
     })
 	})
@@ -121,7 +121,7 @@ io.sockets.on('connection', socket => {
 
   // [DISCONNECTED USER]
   socket.on('disconnect', data => {
-    console.log('Got disconnect!');
+    console.log(`${socket.id} is disconnect.`);
 
     let removeIndex = users.map(function(item) { return item.id_socket; }).indexOf(socket.id);
     users.splice(removeIndex, 1);
