@@ -67,6 +67,19 @@
                 Submit
               </button>
             </form>
+            <form id="submit-username" style="margin-top: 20px">
+              <div class="form-group">
+                <label for="exampleInputEmail1">
+                  <strong>Role:</strong>
+                </label>
+                <br/>
+                <select id="role-data">
+                  <option value="choose_role">Pilih Role</option>
+                  <option value="member">Member</option>
+                  <option value="customer_service">Customer Service</option>
+                </select>
+              </div>
+            </form>
           </div>
           <div class="col-md-12">
             <h5>
@@ -145,9 +158,11 @@
       // receipt control
       let sendToData = $('#send-to-data');
       let receiptTarget = $('#receipt-target');
-      // username control
-      let submitUsername = $('#submit-username');
+
       let usernameData = $('#username-data');
+      let roleData = $('#role-data');
+
+      let submitUsername = $('#submit-username');
       let usernameDataButton = $('#username-data-button');
       let appendedUsername = $('#appended-username');
       let userCount = $('#user_count');
@@ -182,10 +197,18 @@
       submitUsername.on('submit', e => {
         e.preventDefault();
 
+        if (usernameData.val() == '') {
+          return alert('Mohon masukan username utk memudahkan identifikasi pengguna.')
+        }
+        if (roleData.val() == 'choose_role') {
+          return alert('Mohon pilih role terlebih dahulu.')
+        }
+
         // set_username_socket
         socket.emit('set_username_socket', {
           id_socket: socket.id,
-          username_socket: usernameData.val()
+          username_socket: usernameData.val(),
+          role_user: roleData.val()
         });
 
         $('.container4').css('background-color', 'white');
@@ -193,6 +216,7 @@
         chatData.removeAttr('disabled');
         chatDataButton.removeAttr('disabled');
         usernameData.attr('disabled', 'disabled');
+        roleData.attr('disabled', 'disabled');
         usernameDataButton.attr('disabled', 'disabled');
       });
 
@@ -233,12 +257,14 @@
           sender_id_socket: socket.id,
           username_socket: usernameData.val(),
           message: chatData.val(),
+          role_user: roleData.val()
         });
 
         chatData.val('');
       });
 
       socket.on('private message', data => {
+        console.log('asdasdsad', data);
         appendedChat.append(
           `<div class="card card-body bg-light" style="margin-top:5px">${
             data.username_sender
@@ -248,24 +274,54 @@
 
       // socket get_online_users
       socket.on('get_online_users', data => {
-        let username = "No Name"
         appendedUsername.html('');
 
-        for (let i = 0; i < data.users.length; i++) {
-          if (data.users[i].id_socket !== socket.id && data.users[i].username_socket) {
-            data.users[i].username_socket == usernameData.val()
+        // only visible 1 Customer Service user in list Customer Service
+        let visible_only_one_cs = []
+        for (var i = 0; i < data.users.length; i++) {
+          if (data.users[i].role_user == 'customer_service') {
+            visible_only_one_cs.push(data.users[i])
+            break
+          }
+        }
+
+        let filter_final_users = data.users.filter(item => item.role_user == 'member')
+        let filter_final_users2 = [...filter_final_users, ...visible_only_one_cs]
+
+        for (let i = 0; i < filter_final_users2.length; i++) {
+          if (filter_final_users2[i].id_socket !== socket.id && filter_final_users2[i].username_socket) {
+            filter_final_users2[i].username_socket == usernameData.val()
             ? null
             : appendedUsername.append(
-              `<li id="get-username-id" value="${
-                data.users[i].id_socket
-              }" class="list-group-item" style="margin-top: 5px">${
-                data.users[i].username_socket
-              }</li>`,
+              `
+              <table>
+                <th style="width: 60px">
+                  <b>
+                  ${
+                    filter_final_users2[i].role_user == 'member' ?
+                      '[M]'
+                    :
+                    filter_final_users2[i].role_user == 'customer_service' ?
+                      '[CS]'
+                    :
+                      '[Unidentified]'
+                  }
+                  </b>
+                </th>
+                <th>
+                  <li id="get-username-id" value="${
+                    filter_final_users2[i].id_socket
+                  }" class="list-group-item" style="margin-top: 5px">${
+                    filter_final_users2[i].username_socket
+                  }</li>
+                </th>
+              </table>
+              `,
             );
           }
         }
 
-        userCount.text(data.users.filter(item => item.id_socket !== socket.id).length);
+        userCount.text(filter_final_users2.filter(item => item.id_socket !== socket.id).length);
       });
     </script>
   </body>

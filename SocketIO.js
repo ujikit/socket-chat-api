@@ -107,7 +107,8 @@ io.sockets.on('connection', socket => {
 
   users.push({
     id_socket: socket.id,
-    username_socket: ''
+    username_socket: '',
+		role_user: ''
   });
 
 
@@ -143,6 +144,7 @@ io.sockets.on('connection', socket => {
     if (data.id_socket === socket.id) {
       let itemIndex = users.findIndex((item => item.id_socket == data.id_socket));
       users[itemIndex].username_socket = data.username_socket
+      users[itemIndex].role_user = data.role_user
     }
 
     io.sockets.emit("get_online_users", {
@@ -159,18 +161,35 @@ io.sockets.on('connection', socket => {
 
   // send message [PUBLIC]
   socket.on('send message', (data) => {
-		try {
-			console.log('zxcxcsdsd', data);
-			// trigger new message to view
-			io.to(data.id_socket).emit('private message', {
-				id: new Date().getTime(),
-				id_socket_target: data.id_socket,
-				id_socket_sender: data.sender_id_socket,
-				username_sender: data.username_socket,
-				message: data.message
-			})
-		} catch (e) {
-			console.log('error', JSOn.stringify(e));
+
+		// if Member send message to Customer Service then send it (emit) to all Customer Service with loop
+		if (data.role_user == 'member') {
+			for (var i = 0; i < users.length; i++) {
+				if (users[i].role_user == 'customer_service') {
+					io.to(users[i].id_socket).emit('private message', {
+						id: new Date().getTime(),
+						id_socket_target: data.id_socket,
+						id_socket_sender: data.sender_id_socket,
+						username_sender: data.username_socket,
+						message: data.message
+					})
+				}
+			}
 		}
+		else {
+			try {
+				// trigger new message to view
+				io.to(data.id_socket).emit('private message', {
+					id: new Date().getTime(),
+					id_socket_target: data.id_socket,
+					id_socket_sender: data.sender_id_socket,
+					username_sender: data.username_socket,
+					message: data.message
+				})
+			} catch (e) {
+				console.log('error', JSON.stringify(e));
+			}
+		}
+
   })
 });
