@@ -159,6 +159,7 @@
       let sendToData = $('#send-to-data');
       let receiptTarget = $('#receipt-target');
 
+      let init_user_id = new Date().getTime();
       let usernameData = $('#username-data');
       let roleData = $('#role-data');
 
@@ -208,7 +209,8 @@
         socket.emit('set_username_socket', {
           id_socket: socket.id,
           username_socket: usernameData.val(),
-          role_user: roleData.val()
+          id_user: init_user_id,
+          role_user: roleData.val(),
         });
 
         $('.container4').css('background-color', 'white');
@@ -255,6 +257,7 @@
         socket.emit('send message', {
           id_socket: regReplace2,
           sender_id_socket: socket.id,
+          id_user_socket: init_user_id,
           username_socket: usernameData.val(),
           message: chatData.val(),
           role_user: roleData.val()
@@ -299,10 +302,10 @@
                   <b>
                   ${
                     filter_final_users2[i].role_user == 'member' ?
-                      '[M]'
+                      `[M ${filter_final_users2[i].id_user}]`
                     :
                     filter_final_users2[i].role_user == 'customer_service' ?
-                      '[CS]'
+                      `[CS ${filter_final_users2[i].id_user}]`
                     :
                       '[Unidentified]'
                   }

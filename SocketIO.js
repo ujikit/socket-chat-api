@@ -108,7 +108,8 @@ io.sockets.on('connection', socket => {
   users.push({
     id_socket: socket.id,
     username_socket: '',
-		role_user: ''
+		id_user: '',
+		role_user: '',
   });
 
 
@@ -144,6 +145,7 @@ io.sockets.on('connection', socket => {
     if (data.id_socket === socket.id) {
       let itemIndex = users.findIndex((item => item.id_socket == data.id_socket));
       users[itemIndex].username_socket = data.username_socket
+      users[itemIndex].id_user = data.id_user
       users[itemIndex].role_user = data.role_user
     }
 
@@ -170,6 +172,7 @@ io.sockets.on('connection', socket => {
 						id: new Date().getTime(),
 						id_socket_target: data.id_socket,
 						id_socket_sender: data.sender_id_socket,
+						id_user_sender: data.id_user_socket,
 						username_sender: data.username_socket,
 						message: data.message
 					})
@@ -183,6 +186,7 @@ io.sockets.on('connection', socket => {
 					id: new Date().getTime(),
 					id_socket_target: data.id_socket,
 					id_socket_sender: data.sender_id_socket,
+					id_user_sender: data.id_user_socket,
 					username_sender: data.username_socket,
 					message: data.message
 				})
