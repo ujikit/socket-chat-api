@@ -19,6 +19,10 @@ let connection = mysql.createConnection({
 	database : "chat"
 });
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(__dirname)); // untuk akses node modules
+
 server.listen(8080);
 console.log('Server is running in: http://localhost:8080');
 
@@ -195,5 +199,20 @@ io.sockets.on('connection', socket => {
 			}
 		}
 
+  })
+
+  socket.on('blast_notification_to_backend', (body) => {
+		console.log('blast_notification_to_backend', body);
+
+		let {
+			title,
+			message,
+			data
+		} = body;
+		io.sockets.emit('blast_notification_to_frontend', {
+			title,
+			message,
+			data
+		})
   })
 });

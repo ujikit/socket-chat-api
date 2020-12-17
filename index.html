@@ -8,9 +8,8 @@
     />
     <link
       rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-      crossorigin="anonymous"
+      type="text/css"
+      href="./src/assets/css/bootstrap.min.css"
     />
     <title>Ngetes socket client</title>
     <style>
@@ -94,9 +93,9 @@
             <ul id="appended-username" class="list-group"></ul>
           </div>
         </div>
-        <div class="col-md-8">
+        <div class="col-md-4">
           <div class="row">
-            <div class="col-md-5">
+            <div class="col-lg-12">
               <div class="form-group">
                 <label for="exampleInputEmail1"><strong>To</strong></label>
                 <div id="send-to-data" class="container4">
@@ -127,10 +126,44 @@
                   class="btn btn-primary"
                   disabled
                 >
-                  Kirim pesan
+                  Kirim Pesan
                 </button>
               </form>
               <div id="appended-chat" style="margin-top:20px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="row">
+            <div class="col-lg-12">
+              <form id="blast-notification-form">
+                <div class="form-group">
+                  <label for="exampleInputEmail1"><strong>Title Blast</strong></label>
+                  <input
+                    id="blast-notification-input-title"
+                    class="form-control"
+                    placeholder="Enter title"
+                    autocomplete="off"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="exampleInputEmail1"
+                    ><strong>Message Blast</strong></label
+                  >
+                  <input
+                    id="blast-notification-input-message"
+                    class="form-control"
+                    placeholder="Enter message"
+                  />
+                </div>
+                <button
+                  id="blast-notification-button"
+                  type="submit"
+                  class="btn btn-primary"
+                >
+                  Kirim Notifikasi ke Semua Pengguna
+                </button>
+              </form>
             </div>
           </div>
         </div>
@@ -147,8 +180,7 @@
       crossorigin="anonymous"
     ></script>
     <script
-      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      src="./src/assets/js/bootstrap.min.js"
       crossorigin="anonymous"
     ></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
@@ -172,6 +204,12 @@
       let chatData = $('#chat-data');
       let chatDataButton = $('#chat-data-button');
       let appendedChat = $('#appended-chat');
+
+      // push_notification
+      let blast_notification_form = $('#blast-notification-form');
+      let blast_notification_input_title = $('#blast-notification-input-title');
+      let blast_notification_input_message = $('#blast-notification-input-message');
+      let blast_notification_button = $('#blast-notification-button');
 
       // input receipt
       sendToData.append(
@@ -265,6 +303,25 @@
 
         chatData.val('');
       });
+
+
+      // Push Notification
+      blast_notification_form.submit(e => {
+        e.preventDefault();
+
+        if (!blast_notification_input_title.val() || !blast_notification_input_message.val()) {
+          return alert('Mohon isi TITLE & MESSAGE')
+        }
+        socket.emit('blast_notification_to_backend', {
+          title: blast_notification_input_title.val(),
+    			message: blast_notification_input_message.val(),
+    			data: {}
+        });
+
+        blast_notification_input_title.val('');
+        blast_notification_input_message.val('');
+      });
+      // ./Push Notification
 
       socket.on('private message', data => {
         console.log('asdasdsad', data);
