@@ -26,6 +26,8 @@ app.use(express.static(__dirname)); // untuk akses node modules
 server.listen(8080);
 console.log('Server is running in: http://localhost:8080');
 
+let date_now = new Date().getTime();
+
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
@@ -173,7 +175,7 @@ io.sockets.on('connection', socket => {
 			for (var i = 0; i < users.length; i++) {
 				if (users[i].role_user == 'customer_service') {
 					io.to(users[i].id_socket).emit('private message', {
-						id: new Date().getTime(),
+						id: date_now,
 						id_socket_target: data.id_socket,
 						id_socket_sender: data.sender_id_socket,
 						id_user_sender: data.id_user_socket,
@@ -187,7 +189,7 @@ io.sockets.on('connection', socket => {
 			try {
 				// trigger new message to view
 				io.to(data.id_socket).emit('private message', {
-					id: new Date().getTime(),
+					id: date_now,
 					id_socket_target: data.id_socket,
 					id_socket_sender: data.sender_id_socket,
 					id_user_sender: data.id_user_socket,
