@@ -1,9 +1,13 @@
-const http = require('http');
 const express = require('express');
 const app = express();
 const server = require('http').createServer(app);
 const bodyParser = require('body-parser');
-const io = require('socket.io').listen(server);
+const io = require('socket.io')(server, {
+  serveClient: false,
+  pingInterval: 115000,
+  pingTimeout: 115000,
+  cookie: false
+});
 const mysql = require('mysql');
 
 app.use(bodyParser.urlencoded({extended: false}));
@@ -118,18 +122,16 @@ io.sockets.on('connection', socket => {
 		role_user: '',
   });
 
-
   io.sockets.emit("get_online_users", {
     users,
     users_count: users.length,
   });
 
-  console.log("Berhasil terkoneksi : ", socket.id);
-  console.log("Total berhasil terkoneksi : ", users.length);
+  console.log("[CONNECTED]:", socket.id, `(Total ${users.length})`);
 
   // [DISCONNECTED USER]
   socket.on('disconnect', data => {
-    console.log(`${socket.id} is disconnect.`);
+    console.log('[DISCONNECT]:', socket.id, `(Total ${users.length})`, `(${data})`);
 
     let removeIndex = users.map(function(item) { return item.id_socket; }).indexOf(socket.id);
     users.splice(removeIndex, 1);
