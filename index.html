@@ -193,7 +193,6 @@
       let sendToData = $('#send-to-data');
       let receiptTarget = $('#receipt-target');
 
-      let init_user_id = new Date().getTime();
       let usernameData = $('#username-data');
       let roleData = $('#role-data');
 
@@ -249,7 +248,7 @@
         socket.emit('set_username_socket', {
           id_socket: socket.id,
           username_socket: usernameData.val(),
-          id_user: init_user_id,
+          id_user: new Date().getTime(),
           role_user: roleData.val(),
         });
 
@@ -297,7 +296,7 @@
         socket.emit('send message', {
           id_socket: regReplace2,
           sender_id_socket: socket.id,
-          id_user_socket: init_user_id,
+          id_user_socket: new Date().getTime(),
           username_socket: usernameData.val(),
           message: chatData.val(),
           role_user: roleData.val()
