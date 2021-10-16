@@ -3,7 +3,6 @@ const app = express();
 const http = require("http");
 // const https = require("https"); // comment if only http
 const bodyParser = require("body-parser");
-const mysql = require("mysql");
 const { networkInterfaces } = require("os");
 
 // var privateKey = fs.readFileSync("????.key", "utf8"); // comment if only http
@@ -25,13 +24,6 @@ app.use(bodyParser.json());
 
 users = [];
 connections = [];
-
-const connection = mysql.createConnection({
-  host: "localhost",
-  user: "user",
-  password: "",
-  database: "chat"
-});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -64,69 +56,16 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
 
-app.post("/login", (req, res) => {
-  console.log("request_data", req.body);
-  const { username } = req.body;
-  const query = `SELECT * FROM users WHERE username='${username}'`;
-  connection.query(query, function(err, result) {
-    console.log("user_data", result);
-
-    if (err) throw err;
-    if (!result.length) {
-      return res.json({
-        code: 401,
-        message: "Pengguna tidak ditemukan.",
-        data: []
-      });
-    }
-
-    return res.json({
-      code: 200,
-      message: "Succesfully logged in.",
-      data: result
-    });
-  });
-});
-
 app.put("/set-id-socket-user", (req, res) => {
   console.log("[request_data] /set-id-socket-user =>", req.body);
-
-  const { username, id_socket } = req.body;
-  const query = `UPDATE users SET id_socket='${id_socket}' WHERE username='${username}'`;
-  connection.query(query, function(err, result) {
-    console.log("set_socket_id_data", result);
-
-    if (err) throw err;
-    return res.json({
-      code: 200,
-      message: `Update id socket pengguna ${username} berhasil. ${id_socket}`,
-      data: result
-    });
-  });
 });
 
 app.get("/show-user/:username", (req, res) => {
   console.log("[request_data] /show_user/:username =>", req.body);
-
-  const { username } = req.params;
-  const query = `SELECT * FROM users where username = '${username}'`;
-  connection.query(query, function(err, result) {
-    if (err) throw err;
-    console.log("user_data", result);
-    res.json(result);
-  });
 });
 
 app.get("/conversations/:username", (req, res) => {
   console.log("[request_data] /conversations =>", req.params);
-
-  const { username } = req.params;
-  const query = `SELECT * FROM conversations WHERE sender_username = '${username}' OR receiver_username = '${username}'`;
-  connection.query(query, function(err, result) {
-    if (err) throw err;
-    console.log("conversations_data", result);
-    res.json(result);
-  });
 });
 
 app.get("/conversation-messages/:username/:receiver_username", (req, res) => {
@@ -134,14 +73,6 @@ app.get("/conversation-messages/:username/:receiver_username", (req, res) => {
     "[request_data] /conversation-messages/:username/:receiver_username =>",
     req.params
   );
-
-  const { username, receiver_username } = req.params;
-  const query = `SELECT * FROM conversations WHERE sender_username = '${username}' OR receiver_username = '${username}' OR sender_username = '${receiver_username}' OR receiver_username = '${receiver_username}'`;
-  connection.query(query, function(err, result) {
-    if (err) throw err;
-    console.log("conversations_data", result);
-    res.json(result);
-  });
 });
 
 io.sockets.on("connection", socket => {
