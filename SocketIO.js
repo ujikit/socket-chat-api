@@ -1,9 +1,9 @@
+// const fs = require("fs"); // comment if only http
 const express = require("express");
 const app = express();
 const http = require("http");
 // const https = require("https"); // comment if only http
 const bodyParser = require("body-parser");
-const { networkInterfaces } = require("os");
 
 // var privateKey = fs.readFileSync("????.key", "utf8"); // comment if only http
 // var certificate = fs.readFileSync("????.crt", "utf8"); // comment if only http
@@ -31,24 +31,6 @@ app.use(express.static(__dirname)); // untuk akses node modules
 
 httpServer.listen(8080);
 // httpsServer.listen(8081); // comment if only http
-
-const getIpAddress = () => {
-  const nets = networkInterfaces();
-  const results = Object.create(null); // Or just '{}', an empty object
-
-  for (const name of Object.keys(nets)) {
-    for (const net of nets[name]) {
-      // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
-      if (net.family === "IPv4" && !net.internal) {
-        if (!results[name]) {
-          results[name] = [];
-        }
-        results[name].push(net.address);
-      }
-    }
-  }
-  return results;
-};
 
 console.log(`\n[OK] Server is running on port 8080\n`);
 
