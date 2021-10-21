@@ -1,36 +1,36 @@
 // const fs = require("fs"); // comment if only http
 const express = require("express");
-const app = express();
-const http = require("http");
+const { createServer } = require("http");
 // const https = require("https"); // comment if only http
-const bodyParser = require("body-parser");
+const { Server } = require("socket.io");
 
+const app = express();
 // var privateKey = fs.readFileSync("????.key", "utf8"); // comment if only http
 // var certificate = fs.readFileSync("????.crt", "utf8"); // comment if only http
-// var credentials = { key: privateKey, cert: certificate }; // comment if only http
-const httpServer = http.createServer(app);
+// var credentials = {
+//   key: privateKey,
+//   cert: certificate,
+//   secure: true,
+//   reconnect: true,
+//   rejectUnauthorized: false
+
+// }; // comment if only http
+const httpServer = createServer(app);
 // const httpsServer = https.createServer(credentials, app); // comment if only http
 
 // if running in http, use: httpServer,
 // if running in https, use: httpsServer,
-const io = require("socket.io")(httpServer, {
+const io = new Server(httpServer, {
   serveClient: false,
   pingInterval: 115000,
   pingTimeout: 115000,
   cookie: false
 });
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
 
 users = [];
 connections = [];
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname)); // untuk akses node modules
-
-httpServer.listen(8080);
-// httpsServer.listen(8081); // comment if only http
 
 console.log(`\n[OK] Server is running on port 8080\n`);
 
@@ -57,7 +57,7 @@ app.get("/conversation-messages/:username/:receiver_username", (req, res) => {
   );
 });
 
-io.sockets.on("connection", socket => {
+io.on("connection", socket => {
   users.push({
     id_socket: socket.id,
     username_socket: "",
@@ -167,3 +167,6 @@ io.sockets.on("connection", socket => {
     });
   });
 });
+
+httpServer.listen(8080);
+// httpsServer.listen(8081); // comment if only http

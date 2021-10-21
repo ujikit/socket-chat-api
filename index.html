@@ -44,8 +44,7 @@
       <div class="row">
         <div class="col-md-4">
           <div class="col-md-12" style="margin-bottom: 30px">
-            <div id="current-id-socket">
-            </div>
+            <div id="current-id-socket"></div>
             <form id="submit-username">
               <div class="form-group">
                 <label for="exampleInputEmail1"
@@ -71,7 +70,7 @@
                 <label for="exampleInputEmail1">
                   <strong>Role:</strong>
                 </label>
-                <br/>
+                <br />
                 <select id="role-data">
                   <option value="choose_role">Pilih Role</option>
                   <option value="member">Member</option>
@@ -138,7 +137,9 @@
             <div class="col-lg-12">
               <form id="blast-notification-form">
                 <div class="form-group">
-                  <label for="exampleInputEmail1"><strong>Title Blast</strong></label>
+                  <label for="exampleInputEmail1"
+                    ><strong>Title Blast</strong></label
+                  >
                   <input
                     id="blast-notification-input-title"
                     class="form-control"
@@ -183,94 +184,98 @@
       src="./src/assets/js/bootstrap.min.js"
       crossorigin="anonymous"
     ></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.1/socket.io.js"></script>
 
     <script>
-      const socket = io('http://127.0.0.1:8080', {
-        transports: ['websocket']
+      const socket = io("http://127.0.0.1:8080", {
+        transports: ["websocket"]
       });
       // receipt control
-      let sendToData = $('#send-to-data');
-      let receiptTarget = $('#receipt-target');
+      let sendToData = $("#send-to-data");
+      let receiptTarget = $("#receipt-target");
 
-      let usernameData = $('#username-data');
-      let roleData = $('#role-data');
+      let usernameData = $("#username-data");
+      let roleData = $("#role-data");
 
-      let submitUsername = $('#submit-username');
-      let usernameDataButton = $('#username-data-button');
-      let appendedUsername = $('#appended-username');
-      let userCount = $('#user_count');
+      let submitUsername = $("#submit-username");
+      let usernameDataButton = $("#username-data-button");
+      let appendedUsername = $("#appended-username");
+      let userCount = $("#user_count");
       // chat control
-      let submitchat = $('#submit-chat');
-      let chatData = $('#chat-data');
-      let chatDataButton = $('#chat-data-button');
-      let appendedChat = $('#appended-chat');
+      let submitchat = $("#submit-chat");
+      let chatData = $("#chat-data");
+      let chatDataButton = $("#chat-data-button");
+      let appendedChat = $("#appended-chat");
 
       // push_notification
-      let blast_notification_form = $('#blast-notification-form');
-      let blast_notification_input_title = $('#blast-notification-input-title');
-      let blast_notification_input_message = $('#blast-notification-input-message');
-      let blast_notification_button = $('#blast-notification-button');
+      let blast_notification_form = $("#blast-notification-form");
+      let blast_notification_input_title = $("#blast-notification-input-title");
+      let blast_notification_input_message = $(
+        "#blast-notification-input-message"
+      );
+      let blast_notification_button = $("#blast-notification-button");
 
       // input receipt
       sendToData.append(
-        `<button class="btn btn-outline-danger" style="border-color:white; background-color: transparent;">Select a receipt.</button>`,
+        `<button class="btn btn-outline-danger" style="border-color:white; background-color: transparent;">Select a receipt.</button>`
       );
-      appendedUsername.on('click', '#get-username-id', function() {
-        sendToData.html('');
+      appendedUsername.on("click", "#get-username-id", function() {
+        sendToData.html("");
         sendToData.append(
           `<button id="receipt-target" class="btn btn-outline-success" value="${$(
-            this,
-          ).attr('value')}">${$(this).text()}</button>`,
+            this
+          ).attr("value")}">${$(this).text()}</button>`
         );
       });
 
       // delete receipt
-      sendToData.on('click', '#receipt-target', function() {
+      sendToData.on("click", "#receipt-target", function() {
         $(this).remove();
         // alert(`[SOCKET ID]: ${$(this).attr("value")} \n[USERNAME]: ${$(this).text()}`)
         sendToData.append(
-          `<button class="btn btn-outline-danger" style="border-color:white; background-color: transparent;">Select a receipt.</button>`,
+          `<button class="btn btn-outline-danger" style="border-color:white; background-color: transparent;">Select a receipt.</button>`
         );
       });
 
-      submitUsername.on('submit', e => {
+      submitUsername.on("submit", e => {
         e.preventDefault();
 
-        if (usernameData.val() == '') {
-          return alert('Mohon masukan username utk memudahkan identifikasi pengguna.')
+        if (usernameData.val() == "") {
+          return alert(
+            "Mohon masukan username utk memudahkan identifikasi pengguna."
+          );
         }
-        if (roleData.val() == 'choose_role') {
-          return alert('Mohon pilih role terlebih dahulu.')
+        if (roleData.val() == "choose_role") {
+          return alert("Mohon pilih role terlebih dahulu.");
         }
 
         // set_username_socket
-        socket.emit('set_username_socket', {
+        socket.emit("set_username_socket", {
           id_socket: socket.id,
           username_socket: usernameData.val(),
           id_user: new Date().getTime(),
-          role_user: roleData.val(),
+          role_user: roleData.val()
         });
 
-        $('.container4').css('background-color', 'white');
-        $('#current-id-socket').html(`<p>${socket.id}</p>`)
-        chatData.removeAttr('disabled');
-        chatDataButton.removeAttr('disabled');
-        usernameData.attr('disabled', 'disabled');
-        roleData.attr('disabled', 'disabled');
-        usernameDataButton.attr('disabled', 'disabled');
+        $(".container4").css("background-color", "white");
+        $("#current-id-socket").html(`<p>${socket.id}</p>`);
+        chatData.removeAttr("disabled");
+        chatDataButton.removeAttr("disabled");
+        usernameData.attr("disabled", "disabled");
+        roleData.attr("disabled", "disabled");
+        usernameDataButton.attr("disabled", "disabled");
       });
 
       submitchat.submit(e => {
         e.preventDefault();
 
-        let usernameData = $('#username-data');
+        let usernameData = $("#username-data");
         let getSocketId = sendToData.html();
         let regReplace1 = getSocketId.replace(
           /<button id="receipt-target" class="btn btn-outline-success" value="/gi,
-          '',
+          ""
         );
-        let regReplace2 = regReplace1.replace(/">.+<\/button>/gi, '');
+        let regReplace2 = regReplace1.replace(/">.+<\/button>/gi, "");
 
         // $.ajax({
         //   type: 'POST',
@@ -293,7 +298,7 @@
         // });
 
         // socket send message
-        socket.emit('send message', {
+        socket.emit("send message", {
           id_socket: regReplace2,
           sender_id_socket: socket.id,
           id_user_socket: new Date().getTime(),
@@ -302,70 +307,76 @@
           role_user: roleData.val()
         });
 
-        chatData.val('');
+        chatData.val("");
       });
-
 
       // Push Notification
       blast_notification_form.submit(e => {
         e.preventDefault();
 
-        if (!blast_notification_input_title.val() || !blast_notification_input_message.val()) {
-          return alert('Mohon isi TITLE & MESSAGE')
+        if (
+          !blast_notification_input_title.val() ||
+          !blast_notification_input_message.val()
+        ) {
+          return alert("Mohon isi TITLE & MESSAGE");
         }
-        socket.emit('blast_notification_to_backend', {
+        socket.emit("blast_notification_to_backend", {
           title: blast_notification_input_title.val(),
-    			message: blast_notification_input_message.val(),
-    			data: {}
+          message: blast_notification_input_message.val(),
+          data: {}
         });
 
-        blast_notification_input_title.val('');
-        blast_notification_input_message.val('');
+        blast_notification_input_title.val("");
+        blast_notification_input_message.val("");
       });
       // ./Push Notification
 
-      socket.on('private message', data => {
-        console.log('asdasdsad', data);
+      socket.on("private message", data => {
+        console.log("asdasdsad", data);
         appendedChat.append(
-          `<div class="card card-body bg-light" style="margin-top:5px">${
-            data.username_sender
-          }: ${data.message}</div>`,
+          `<div class="card card-body bg-light" style="margin-top:5px">${data.username_sender}: ${data.message}</div>`
         );
       });
 
       // socket get_online_users
-      socket.on('get_online_users', data => {
-        appendedUsername.html('');
+      socket.on("get_online_users", data => {
+        appendedUsername.html("");
 
         // only visible 1 Customer Service user in list Customer Service
-        let visible_only_one_cs = []
+        let visible_only_one_cs = [];
         for (var i = 0; i < data.users.length; i++) {
-          if (data.users[i].role_user == 'customer_service') {
-            visible_only_one_cs.push(data.users[i])
-            break
+          if (data.users[i].role_user == "customer_service") {
+            visible_only_one_cs.push(data.users[i]);
+            break;
           }
         }
 
-        let filter_final_users = data.users.filter(item => item.role_user == 'member')
-        let filter_final_users2 = [...filter_final_users, ...visible_only_one_cs]
+        let filter_final_users = data.users.filter(
+          item => item.role_user == "member"
+        );
+        let filter_final_users2 = [
+          ...filter_final_users,
+          ...visible_only_one_cs
+        ];
 
         for (let i = 0; i < filter_final_users2.length; i++) {
-          if (filter_final_users2[i].id_socket !== socket.id && filter_final_users2[i].username_socket) {
+          if (
+            filter_final_users2[i].id_socket !== socket.id &&
+            filter_final_users2[i].username_socket
+          ) {
             filter_final_users2[i].username_socket == usernameData.val()
-            ? null
-            : appendedUsername.append(
-              `
+              ? null
+              : appendedUsername.append(
+                  `
               <table>
                 <th style="width: 60px">
                   <b>
                   ${
-                    filter_final_users2[i].role_user == 'member' ?
-                      `[M ${filter_final_users2[i].id_user}]`
-                    :
-                    filter_final_users2[i].role_user == 'customer_service' ?
-                      `[CS ${filter_final_users2[i].id_user}]`
-                    :
-                      '[Unidentified]'
+                    filter_final_users2[i].role_user == "member"
+                      ? `[M ${filter_final_users2[i].id_user}]`
+                      : filter_final_users2[i].role_user == "customer_service"
+                      ? `[CS ${filter_final_users2[i].id_user}]`
+                      : "[Unidentified]"
                   }
                   </b>
                 </th>
@@ -377,12 +388,15 @@
                   }</li>
                 </th>
               </table>
-              `,
-            );
+              `
+                );
           }
         }
 
-        userCount.text(filter_final_users2.filter(item => item.id_socket !== socket.id).length);
+        userCount.text(
+          filter_final_users2.filter(item => item.id_socket !== socket.id)
+            .length
+        );
       });
     </script>
   </body>
